@@ -1,0 +1,26 @@
+mainURL:
+  opt: "div.col-md-8 a[href]"
+selectOptionsArchives:
+  type1: ".read_more"
+  type2: "a:contains(Архив номеров)"
+selectOptionsLinksArchivesByDate:
+  type1: "a.title"
+  type2: "table a[href]"
+selectOptionsInfoDateArchives:
+  type1doc: ".obj_issue_summary"
+  type1title: ".title"
+  type1series: ".series"
+  type2doc: "ul > li"
+  type2title: "№\\d+ \\d+ .*"
+selectOptionsPdfParams:
+  type1doc: ".obj_article_summary"
+  type1authors: ".authors"
+  type1title: ".title a"
+  type2doc: "div.sections + ul > li" #"div.sections > ul > li"
+  type2authors: "i"
+  type2title: "b"
+selectOptionsPDFLinks:
+  type1: ".obj_galley_link.pdf"
+  type2: "a:contains(Текст (PDF))"
+selectOptionsPDFDownload:
+  type1: "a.download"
