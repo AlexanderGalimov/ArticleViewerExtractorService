@@ -3,14 +3,10 @@ package cs.vsu.ru.galimov.tasks.articleviewerextractorservice.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 import org.springframework.data.mongodb.core.index.TextIndexed;
 
-@Getter
-@Setter
-@ToString
+@Data
 @JsonDeserialize
 @JsonSerialize
 public class Article {
@@ -24,11 +20,6 @@ public class Article {
     private DateArchive dateArchive;
 
     private PDFParams pdfParams;
-
-    @TextIndexed
-    private String fullText;
-
-    private String uniqUIIDS3;
 
     public Article(Magazine magazine, DepartmentMagazine departmentMagazine, DateArchive dateArchive, PDFParams pdfParams) {
         this.magazine = magazine;

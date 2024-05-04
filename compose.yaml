@@ -1,19 +1,24 @@
-name: common
+name: coursework
+version: '3.8'
 services:
   mongodb:
-    image: 'mongo:latest'
+    image: 'mongo:7'
     environment:
-      - 'MONGO_INITDB_DATABASE=MyDB'
+      - 'MONGO_INITDB_DATABASE=CourseworkDB'
     ports:
       - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
 
   neo4j:
-    image: neo4j:latest
+    image: 'neo4j:5'
     ports:
       - '7474:7474'
       - '7687:7687'
     environment:
       NEO4J_AUTH: neo4j/18520655
+    volumes:
+      - neo4j_data:/data
 
   minio:
     image: minio/minio
@@ -24,6 +29,8 @@ services:
       MINIO_ROOT_USER: alexander
       MINIO_ROOT_PASSWORD: 18520655Minio
     command: server --console-address ":9001" /data
+    volumes:
+      - minio_data:/data
 
   zookeeper:
     image: confluentinc/cp-zookeeper
@@ -52,3 +59,8 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+volumes:
+  mongodb_data:
+  neo4j_data:
+  minio_data:

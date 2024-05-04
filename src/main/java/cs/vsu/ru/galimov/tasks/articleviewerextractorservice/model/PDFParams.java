@@ -1,15 +1,11 @@
 package cs.vsu.ru.galimov.tasks.articleviewerextractorservice.model;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
 import java.util.List;
 
 
-@Getter
-@Setter
-@ToString
+@Data
 public class PDFParams {
     private String link;
 
