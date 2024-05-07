@@ -168,6 +168,9 @@ public class VestnikHtmlPageParser {
 
             for (int i = 0; i < pdfLinks.size(); i++) {
                 String[] authorNamesArray = authors.get(i).split(", ");
+                if(authorNamesArray.length == 0){
+                    authorNamesArray = authors.get(i).split("; ");
+                }
 
                 pdfParams.add(new PDFParams(pdfLinks.get(i), Arrays.asList(authorNamesArray), titles.get(i)));
             }
