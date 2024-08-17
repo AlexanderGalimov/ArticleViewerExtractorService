@@ -1,7 +1,8 @@
 mainURL:
   opt: "div.col-md-8 a[href]"
 selectOptionsArchives:
-  type1: ".read_more"
+  type1new: "a:contains(Архив):not(:contains(до 2017))"
+  type1old: "a:contains(Архив до 2017)"
   type2: "a:contains(Архив номеров)"
 selectOptionsLinksArchivesByDate:
   type1: "a.title"

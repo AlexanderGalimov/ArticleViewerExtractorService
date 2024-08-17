@@ -16,7 +16,6 @@ public class Extractor {
 
     private final VestnikHtmlPageParser pageParser;
 
-
     @Autowired
     public Extractor(VestnikHtmlPageParser pageParser) {
         this.pageParser = pageParser;
@@ -34,7 +33,7 @@ public class Extractor {
         List<String> archives = new ArrayList<>();
 
         for (DepartmentMagazine magazine : departmentMagazines) {
-            archives.add(pageParser.parseMagazineArchive(magazine));
+            archives.add(pageParser.parseMagazineArchives(magazine));
         }
 
         List<Article> articles = makeArticles(departmentMagazines.get(0), archives.get(0), magazinesURLs.get(0));

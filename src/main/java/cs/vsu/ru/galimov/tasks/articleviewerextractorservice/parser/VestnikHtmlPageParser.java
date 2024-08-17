@@ -107,10 +107,10 @@ public class VestnikHtmlPageParser {
     }
 
 
-    public String parseMagazineArchive(DepartmentMagazine departmentMagazine) {
+    public String parseMagazineArchives(DepartmentMagazine departmentMagazine) {
         String result = "";
 
-        List<String> archiveType1 = parseLinkFromPage(departmentMagazine.getUrl(), config.getOpts().get("selectOptionsArchives").get("type1"));
+        List<String> archiveType1 = parseLinkFromPage(departmentMagazine.getUrl(), config.getOpts().get("selectOptionsArchives").get("type1new"));
 
         List<String> archiveType2 = parseLinkFromPage(departmentMagazine.getUrl(), config.getOpts().get("selectOptionsArchives").get("type2"));
 

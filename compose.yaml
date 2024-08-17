@@ -4,7 +4,7 @@ services:
   mongodb:
     image: 'mongo:7'
     environment:
-      - 'MONGO_INITDB_DATABASE=CourseworkDB'
+      - "MONGO_INITDB_DATABASE=CourseworkDB"
     ports:
       - "27017:27017"
     volumes:
