@@ -2,18 +2,20 @@ package cs.vsu.ru.galimov.tasks.articleviewerextractorservice.model;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class DepartmentMagazine {
     private String name;
 
     private String url;
 
-    private String type;
+    private List<Archive> archives;
 
-    public DepartmentMagazine(String name, String url, String type) {
+    public DepartmentMagazine(String name, String url, List<Archive> archives) {
         this.name = name;
         this.url = url;
-        this.type = type;
+        this.archives = archives;
     }
 
     public DepartmentMagazine() {

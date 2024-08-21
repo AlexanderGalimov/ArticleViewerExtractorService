@@ -17,13 +17,16 @@ public class Article {
 
     private DepartmentMagazine departmentMagazine;
 
+    private Archive archive;
+
     private DateArchive dateArchive;
 
     private PDFParams pdfParams;
 
-    public Article(Magazine magazine, DepartmentMagazine departmentMagazine, DateArchive dateArchive, PDFParams pdfParams) {
+    public Article(Magazine magazine, DepartmentMagazine departmentMagazine, Archive archive, DateArchive dateArchive, PDFParams pdfParams) {
         this.magazine = magazine;
         this.departmentMagazine = departmentMagazine;
+        this.archive = archive;
         this.dateArchive = dateArchive;
         this.pdfParams = pdfParams;
     }

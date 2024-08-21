@@ -12,24 +12,16 @@ import java.util.List;
 
 @Component
 @Configuration
-public class Runner {
+public class ArticleSender {
 
     private final InputProducer producer;
-
-    private final Extractor extractor;
 
     private final InputTopic topic;
 
     @Autowired
-    public Runner(InputProducer producer, Extractor extractor, InputTopic topic) {
+    public ArticleSender(InputProducer producer, InputTopic topic) {
         this.producer = producer;
-        this.extractor = extractor;
         this.topic = topic;
-    }
-
-    public void run() {
-        List<Article> articles = extractor.extractArticles();
-        sendMessagesToKafka(articles);
     }
 
     public void sendMessagesToKafka(List<Article> articles) {

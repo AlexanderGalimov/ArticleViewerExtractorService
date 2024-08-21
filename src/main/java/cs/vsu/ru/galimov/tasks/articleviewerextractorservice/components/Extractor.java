@@ -16,12 +16,15 @@ public class Extractor {
 
     private final VestnikHtmlPageParser pageParser;
 
+    private final ArticleSender articleSender;
+
     @Autowired
-    public Extractor(VestnikHtmlPageParser pageParser) {
+    public Extractor(VestnikHtmlPageParser pageParser, ArticleSender articleSender) {
         this.pageParser = pageParser;
+        this.articleSender = articleSender;
     }
 
-    public List<Article> extractArticles() {
+    public void extractArticles() throws InterruptedException {
         List<String> magazinesURlPieces = pageParser.parseGreetingPage();
 
         List<String> names = makeNames(magazinesURlPieces);
@@ -30,37 +33,39 @@ public class Extractor {
 
         List<DepartmentMagazine> departmentMagazines = createDepartmentMagazines(names, magazinesURLs);
 
-        List<String> archives = new ArrayList<>();
-
         for (DepartmentMagazine magazine : departmentMagazines) {
-            archives.add(pageParser.parseMagazineArchives(magazine));
+            List<Archive> currentArchives = pageParser.parseMagazineArchives(magazine.getUrl()).stream().toList();
+            magazine.setArchives(currentArchives);
         }
+        List<Article> articles;
 
-        List<Article> articles = makeArticles(departmentMagazines.get(0), archives.get(0), magazinesURLs.get(0));
-
-        return articles;
+        for (int i = 0; i < departmentMagazines.size(); i++) {
+            List<DateArchive> dateArchives = new ArrayList<>();
+            for (Archive archive: departmentMagazines.get(i).getArchives()) {
+                List<DateArchive> currDateArchives = findDateArchives(archive, magazinesURLs.get(i));
+                articles = makeArticles(departmentMagazines.get(i), currDateArchives, archive);
+                articleSender.sendMessagesToKafka(articles);
+                Thread.sleep(5000);
+            }
+        }
     }
 
-
-    private List<Article> makeArticles(DepartmentMagazine departmentMagazine, String archive, String urlPiece) {
-        List<DateArchive> currDateArchivesLinks = findDateArchives(archive, urlPiece, departmentMagazine.getType());
-
+    private List<Article> makeArticles(DepartmentMagazine departmentMagazine, List<DateArchive> currDateArchivesLinks, Archive archive) {
         List<Article> currArticles = new ArrayList<>();
         for (DateArchive currDateArchive : currDateArchivesLinks) {
-            List<PDFParams> pdfParams = findPdfParams(currDateArchive.getLink(), departmentMagazine.getType());
+            List<PDFParams> pdfParams = findPdfParams(currDateArchive.getLink(), archive.getType());
             for (PDFParams param : pdfParams) {
-                currArticles.add(new Article(pageParser.getMagazine(), departmentMagazine, currDateArchive, param));
+                currArticles.add(new Article(pageParser.getMagazine(), departmentMagazine, archive, currDateArchive, param));
             }
         }
         return currArticles;
     }
 
-    private List<DateArchive> findDateArchives(String archive, String urlPiece, String type) {
-        return pageParser.parseDateArchives(archive,
-                urlPiece, type);
+    private List<DateArchive> findDateArchives(Archive archive, String urlPiece) {
+        return pageParser.parseDateArchives(archive, urlPiece);
     }
 
-    private List<PDFParams> findPdfParams(String dateArchiveLink, String type) {
+    private List<PDFParams> findPdfParams(String dateArchiveLink, ArchiveType type) {
         return pageParser.parsePdfParamsFromDateArchive(dateArchiveLink, type);
     }
 

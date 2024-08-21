@@ -1,9 +1,6 @@
 package cs.vsu.ru.galimov.tasks.articleviewerextractorservice.parser;
 
-import cs.vsu.ru.galimov.tasks.articleviewerextractorservice.model.DateArchive;
-import cs.vsu.ru.galimov.tasks.articleviewerextractorservice.model.DepartmentMagazine;
-import cs.vsu.ru.galimov.tasks.articleviewerextractorservice.model.Magazine;
-import cs.vsu.ru.galimov.tasks.articleviewerextractorservice.model.PDFParams;
+import cs.vsu.ru.galimov.tasks.articleviewerextractorservice.model.*;
 import cs.vsu.ru.galimov.tasks.articleviewerextractorservice.parser.config.HtmlParseConfig;
 import lombok.Getter;
 import org.jsoup.Jsoup;
@@ -12,10 +9,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Getter
 @Component
@@ -67,17 +61,17 @@ public class VestnikHtmlPageParser {
         return new ArrayList<>();
     }
 
-    public List<String> parseInfoFromDateArchivePage(String url, String type) {
+    public List<String> parseInfoFromDateArchivePage(String url, ArchiveType type) {
         List<String> dateArchivesInfo = new ArrayList<>();
         try {
             Document document = Jsoup.connect(url).get();
-            if (Objects.equals(type, "type1")) {
-                Elements summaryElements = document.select(config.getOpts().get("selectOptionsInfoDateArchives").get("type1doc"));
+            if (type == ArchiveType.NEW) {
+                Elements summaryElements = document.select(config.getOpts().get("selectOptionsInfoDateArchives").get("newDoc"));
 
                 for (Element summaryElement : summaryElements) {
                     String currString = "";
-                    Element titleElement = summaryElement.select(config.getOpts().get("selectOptionsInfoDateArchives").get("type1title")).first();
-                    Element seriesElement = summaryElement.select(config.getOpts().get("selectOptionsInfoDateArchives").get("type1series")).first();
+                    Element titleElement = summaryElement.select(config.getOpts().get("selectOptionsInfoDateArchives").get("newTitle")).first();
+                    Element seriesElement = summaryElement.select(config.getOpts().get("selectOptionsInfoDateArchives").get("newSeries")).first();
 
                     String titleText = titleElement.text();
                     String seriesText = seriesElement.text();
@@ -86,13 +80,13 @@ public class VestnikHtmlPageParser {
                     dateArchivesInfo.add(currString);
                 }
             } else {
-                Elements listItems = document.select(config.getOpts().get("selectOptionsInfoDateArchives").get("type2doc"));
+                Elements listItems = document.select(config.getOpts().get("selectOptionsInfoDateArchives").get("oldDoc"));
 
                 for (Element listItem : listItems) {
                     String currLink = "";
                     String listItemText = listItem.text();
 
-                    if (listItemText.matches(config.getOpts().get("selectOptionsInfoDateArchives").get("type2title"))) {
+                    if (listItemText.matches(config.getOpts().get("selectOptionsInfoDateArchives").get("oldTitle"))) {
                         listItemText = listItemText.replace("Содержание", "").trim();
                         currLink = currLink + listItemText;
 
@@ -107,23 +101,33 @@ public class VestnikHtmlPageParser {
     }
 
 
-    public String parseMagazineArchives(DepartmentMagazine departmentMagazine) {
-        String result = "";
-        List<String> archiveType1 = parseLinkFromPage(departmentMagazine.getUrl(), config.getOpts().get("selectOptionsArchives").get("type1new"));
+    public Set<Archive> parseMagazineArchives(String departmentMagazineLink) {
+        Set<Archive> archives = new HashSet<>();
 
-        List<String> archiveType2 = parseLinkFromPage(departmentMagazine.getUrl(), config.getOpts().get("selectOptionsArchives").get("type2"));
+        List<String> archiveMixed = parseLinkFromPage(departmentMagazineLink, config.getOpts().get("selectOptionsArchives").get("mix"));
 
-        if (!archiveType1.isEmpty()) {
-            departmentMagazine.setType("type1");
-            result = archiveType1.get(0);
-        } else if (!archiveType2.isEmpty()) {
-            departmentMagazine.setType("type2");
-            result = config.getMainUrl() + archiveType2.get(0);
+        List<String> archiveOld = parseLinkFromPage(departmentMagazineLink, config.getOpts().get("selectOptionsArchives").get("old"));
+
+        if (!archiveMixed.isEmpty()) {
+            for (String archiveLink: archiveMixed) {
+                Archive archive = new Archive(archiveLink, null);
+                if(archiveLink.contains("journals.vsu.ru")){
+                    archive.setType(ArchiveType.NEW);
+                }
+                else if(archiveLink.contains("vestnik.vsu.ru")){
+                    archive.setType(ArchiveType.OLD);
+                }
+                archives.add(archive);
+            }
+        } else if (!archiveOld.isEmpty()) {
+            archives.add(new Archive(config.getMainUrl() + archiveOld.get(0), ArchiveType.OLD));
         }
-        return result;
+
+        return archives;
     }
 
-    public List<PDFParams> parsePdfParamsFromDateArchive(String datedArchiveUrl, String type) {
+    //todo
+    public List<PDFParams> parsePdfParamsFromDateArchive(String datedArchiveUrl, ArchiveType type) {
         List<String> titles = new ArrayList<>();
         List<String> authors = new ArrayList<>();
         List<String> pdfLinks = new ArrayList<>();
@@ -131,23 +135,23 @@ public class VestnikHtmlPageParser {
 
         try {
             Document doc = Jsoup.connect(datedArchiveUrl).get();
-            if (Objects.equals(type, "type1")) {
-                Elements articleSummaries = doc.select(config.getOpts().get("selectOptionsPdfParams").get("type1doc"));
+            if (type == ArchiveType.NEW) {
+                Elements articleSummaries = doc.select(config.getOpts().get("selectOptionsPdfParams").get("newDoc"));
 
                 for (Element articleSummary : articleSummaries) {
-                    Element titleElement = articleSummary.select(config.getOpts().get("selectOptionsPdfParams").get("type1title")).first();
+                    Element titleElement = articleSummary.select(config.getOpts().get("selectOptionsPdfParams").get("newTitle")).first();
                     String title = titleElement.text();
                     titles.add(title);
 
-                    Element authorsElement = articleSummary.select(config.getOpts().get("selectOptionsPdfParams").get("type1authors")).first();
+                    Element authorsElement = articleSummary.select(config.getOpts().get("selectOptionsPdfParams").get("newAuthors")).first();
                     String author = authorsElement.text();
                     authors.add(author);
                 }
             } else {
-                Elements listItems = doc.select(config.getOpts().get("selectOptionsPdfParams").get("type2doc"));
+                Elements listItems = doc.select(config.getOpts().get("selectOptionsPdfParams").get("oldDoc"));
                 for (Element listItem : listItems) {
-                    String author = listItem.select(config.getOpts().get("selectOptionsPdfParams").get("type2authors")).text();
-                    String title = listItem.select(config.getOpts().get("selectOptionsPdfParams").get("type2title")).text();
+                    String author = listItem.select(config.getOpts().get("selectOptionsPdfParams").get("oldAuthors")).text();
+                    String title = listItem.select(config.getOpts().get("selectOptionsPdfParams").get("oldTitle")).text();
                     if (title != null && author != null) {
                         titles.add(title);
                         authors.add(author);
@@ -157,9 +161,9 @@ public class VestnikHtmlPageParser {
 
             List<String> links = parsePDFPageLink(datedArchiveUrl, type);
 
-            if (Objects.equals(type, "type1")) {
+            if (type == ArchiveType.NEW) {
                 for (String link : links) {
-                    pdfLinks.add(parsePDFDownloadLink(link, "type1"));
+                    pdfLinks.add(parsePDFDownloadLink(link, type));
                 }
             } else {
                 pdfLinks = links;
@@ -180,15 +184,25 @@ public class VestnikHtmlPageParser {
         return pdfParams;
     }
 
-    public List<DateArchive> parseDateArchives(String archive, String content, String typeOfDepartmentMagazine) {
+    public List<DateArchive> parseDateArchives(Archive archive, String content) {
         List<DateArchive> dateArchives = new ArrayList<>();
-        List<String> dateArchivesLinks = parseLinkFromPage(archive, config.getOpts().get("selectOptionsLinksArchivesByDate").get(typeOfDepartmentMagazine));
+        List<String> dateArchivesLinks = new ArrayList<>();
 
-        if (Objects.equals(typeOfDepartmentMagazine, "type2")) {
+        if(archive.getType() == ArchiveType.NEW){
+            List<String> currentDateArchivesLinks;
+            int index = 1;
+            do{
+                currentDateArchivesLinks = parseLinkFromPage(archive.getLink() + "/" + index, config.getOpts().get("selectOptionsLinksArchivesByDate").get("new"));
+                dateArchivesLinks.addAll(currentDateArchivesLinks);
+                index++;
+            } while (!currentDateArchivesLinks.isEmpty());
+        }
+        else {
+            dateArchivesLinks = parseLinkFromPage(archive.getLink(), config.getOpts().get("selectOptionsLinksArchivesByDate").get("old"));
             dateArchivesLinks = makeURlArchives(content, dateArchivesLinks);
         }
 
-        List<String> info = parseInfoFromDateArchivePage(archive, typeOfDepartmentMagazine);
+        List<String> info = parseInfoFromDateArchivePage(archive.getLink(), archive.getType());
         if (dateArchivesLinks.size() == info.size()) {
             for (int i = 0; i < dateArchivesLinks.size(); i++) {
                 dateArchives.add(new DateArchive(info.get(i), dateArchivesLinks.get(i)));
@@ -206,22 +220,22 @@ public class VestnikHtmlPageParser {
         return result;
     }
 
-    public List<String> parsePDFPageLink(String datedArchiveURL, String type) {
+    public List<String> parsePDFPageLink(String datedArchiveURL, ArchiveType type) {
         List<String> pdfLinksByDate = new ArrayList<>();
 
-        if (Objects.equals(type, "type1")) {
-            pdfLinksByDate = parseLinkFromPage(datedArchiveURL, config.getOpts().get("selectOptionsPDFLinks").get("type1"));
+        if (type == ArchiveType.NEW) {
+            pdfLinksByDate = parseLinkFromPage(datedArchiveURL, config.getOpts().get("selectOptionsPDFLinks").get("new"));
         } else {
-            for (String page : parseLinkFromPage(datedArchiveURL, config.getOpts().get("selectOptionsPDFLinks").get("type2"))) {
+            for (String page : parseLinkFromPage(datedArchiveURL, config.getOpts().get("selectOptionsPDFLinks").get("old"))) {
                 pdfLinksByDate.add(config.getMainUrl() + page);
             }
         }
         return pdfLinksByDate;
     }
 
-    public String parsePDFDownloadLink(String url, String type) {
-        if (Objects.equals(type, "type1")) {
-            return parseLinkFromPage(url, config.getOpts().get("selectOptionsPDFDownload").get("type1")).get(0);
+    public String parsePDFDownloadLink(String url, ArchiveType type) {
+        if (type == ArchiveType.NEW) {
+            return parseLinkFromPage(url, config.getOpts().get("selectOptionsPDFDownload").get("new")).get(0);
         } else {
             return null;
         }
