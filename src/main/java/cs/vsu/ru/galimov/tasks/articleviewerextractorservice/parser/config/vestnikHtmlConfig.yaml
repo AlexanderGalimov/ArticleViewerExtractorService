@@ -16,7 +16,7 @@ selectOptionsPdfParams:
   newDoc: ".obj_article_summary"
   newAuthors: ".authors"
   newTitle: ".title a"
-  oldDoc: "div.sections + ul > li" #"div.sections > ul > li"
+  oldDoc: "div.contents + ul > li, div.sections + ul > li" #div.sections + ul > li"
   oldAuthors: "i"
   oldTitle: "b"
 selectOptionsPDFLinks:
