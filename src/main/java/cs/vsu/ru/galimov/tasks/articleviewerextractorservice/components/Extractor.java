@@ -24,7 +24,7 @@ public class Extractor {
         this.articleSender = articleSender;
     }
 
-    public void extractArticles() throws InterruptedException {
+    public void extractArticles() {
         List<String> magazinesURlPieces = pageParser.parseGreetingPage();
 
         List<String> names = makeNames(magazinesURlPieces);
@@ -39,8 +39,8 @@ public class Extractor {
         }
         List<Article> articles;
 
-        for (int i = 0; i < 1; i++) {
-            for (Archive archive: departmentMagazines.get(i).getArchives()) {
+        for (int i = 0; i < departmentMagazines.size(); i++) {
+            for (Archive archive : departmentMagazines.get(i).getArchives()) {
                 List<DateArchive> currDateArchives = findDateArchives(archive, magazinesURLs.get(i));
                 articles = makeArticles(departmentMagazines.get(i), currDateArchives, archive);
                 articleSender.sendMessagesToKafka(articles);
