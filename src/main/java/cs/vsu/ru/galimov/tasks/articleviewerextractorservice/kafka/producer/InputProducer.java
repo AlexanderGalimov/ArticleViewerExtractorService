@@ -2,6 +2,8 @@ package cs.vsu.ru.galimov.tasks.articleviewerextractorservice.kafka.producer;
 
 import com.google.gson.Gson;
 import cs.vsu.ru.galimov.tasks.articleviewerextractorservice.model.Article;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -15,6 +17,8 @@ public class InputProducer {
 
     private final Gson gson;
 
+    private final Logger logger = LoggerFactory.getLogger(InputProducer.class);
+
     @Autowired
     public InputProducer(KafkaTemplate<String, String> kafkaTemplate, Gson gson) {
         this.kafkaTemplate = kafkaTemplate;
@@ -23,7 +27,7 @@ public class InputProducer {
 
     public void send(String topic, Article article) {
         String articleJson = convertArticleToJson(article);
-        System.out.println("sent");
+        logger.info("Article successfully sent");
         kafkaTemplate.send(topic, articleJson);
     }
 

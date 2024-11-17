@@ -2,6 +2,8 @@ package cs.vsu.ru.galimov.tasks.articleviewerextractorservice.parser.config;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import java.nio.file.Files;
@@ -13,8 +15,8 @@ import java.util.Map;
 @Getter
 @Setter
 public class HtmlParseConfig {
+    private static final Logger logger = LoggerFactory.getLogger(HtmlParseConfig.class);
     private final String mainUrl;
-
     private final Map<String, Map<String, String>> opts;
 
     public HtmlParseConfig(String mainUrl) {
@@ -54,7 +56,7 @@ public class HtmlParseConfig {
 
             return parseYamlMap(yamlMap);
         } catch (Exception e) {
-            System.err.println("Error" + e.getMessage());
+            logger.error("Error in init opts" + e.getMessage());
         }
         return null;
     }

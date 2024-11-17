@@ -39,7 +39,7 @@ public class Extractor {
         }
         List<Article> articles;
 
-        for (int i = 0; i < departmentMagazines.size(); i++) {
+        for (int i = 0; i < 2; i++) {
             for (Archive archive : departmentMagazines.get(i).getArchives()) {
                 List<DateArchive> currDateArchives = findDateArchives(archive, magazinesURLs.get(i));
                 articles = makeArticles(departmentMagazines.get(i), currDateArchives, archive);

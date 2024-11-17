@@ -1,6 +1,7 @@
 package cs.vsu.ru.galimov.tasks.articleviewerextractorservice.model;
 
 import lombok.Data;
+import org.checkerframework.common.aliasing.qual.Unique;
 
 import java.util.List;
 

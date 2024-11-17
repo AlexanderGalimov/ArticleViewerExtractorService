@@ -7,6 +7,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -15,8 +17,12 @@ import java.util.*;
 @Component
 public class VestnikHtmlPageParser {
     private static final String mainURL = "http://www.vestnik.vsu.ru";
+
     private final Magazine magazine;
+
     private final HtmlParseConfig config = new HtmlParseConfig(mainURL);
+
+    private final Logger logger = LoggerFactory.getLogger(VestnikHtmlPageParser.class);
 
     public VestnikHtmlPageParser() {
         this.magazine = new Magazine("Vestnik", mainURL);
@@ -56,7 +62,7 @@ public class VestnikHtmlPageParser {
             }
             return result;
         } catch (Exception e) {
-            System.out.println("Error in parse link from page listen" + e.getMessage());
+            logger.error("Error in parse link from page listen" + e.getMessage());
         }
         return new ArrayList<>();
     }
@@ -95,7 +101,7 @@ public class VestnikHtmlPageParser {
                 }
             }
         } catch (Exception e) {
-            System.out.println("Error in parseInfoFromDateArchivePage" + e.getMessage());
+            logger.error("Error in parseInfoFromDateArchivePage" + e.getMessage());
         }
         return dateArchivesInfo;
     }
@@ -108,25 +114,22 @@ public class VestnikHtmlPageParser {
 
         List<String> archiveOld = parseLinkFromPage(departmentMagazineLink, config.getOpts().get("selectOptionsArchives").get("old"));
 
-        if (!archiveMixed.isEmpty()) {
-            for (String archiveLink: archiveMixed) {
+        if (!archiveOld.isEmpty()) {
+            archives.add(new Archive(config.getMainUrl() + archiveOld.get(0), ArchiveType.OLD));
+        } else {
+            for (String archiveLink : archiveMixed) {
                 Archive archive = new Archive(archiveLink, null);
-                if(archiveLink.contains("journals.vsu.ru")){
+                if (archiveLink.contains("journals.vsu.ru")) {
                     archive.setType(ArchiveType.NEW);
-                }
-                else if(archiveLink.contains("vestnik.vsu.ru")){
+                } else if (archiveLink.contains("vestnik.vsu.ru")) {
                     archive.setType(ArchiveType.OLD);
                 }
                 archives.add(archive);
             }
-        } else if (!archiveOld.isEmpty()) {
-            archives.add(new Archive(config.getMainUrl() + archiveOld.get(0), ArchiveType.OLD));
         }
-
         return archives;
     }
 
-    //todo
     public List<PDFParams> parsePdfParamsFromDateArchive(String datedArchiveUrl, ArchiveType type) {
         List<String> titles = new ArrayList<>();
         List<String> authors = new ArrayList<>();
@@ -171,7 +174,7 @@ public class VestnikHtmlPageParser {
 
             for (int i = 0; i < pdfLinks.size(); i++) {
                 String[] authorNamesArray = authors.get(i).split(", ");
-                if(authorNamesArray.length == 0){
+                if (authorNamesArray.length == 0) {
                     authorNamesArray = authors.get(i).split("; ");
                 }
 
@@ -179,7 +182,7 @@ public class VestnikHtmlPageParser {
             }
 
         } catch (Exception e) {
-            System.out.println("Error in parsePdfParamsFromDateArchive" + e.getMessage());
+            logger.error("Error in parsePdfParamsFromDateArchive" + e.getMessage());
         }
         return pdfParams;
     }
@@ -188,16 +191,15 @@ public class VestnikHtmlPageParser {
         List<DateArchive> dateArchives = new ArrayList<>();
         List<String> dateArchivesLinks = new ArrayList<>();
 
-        if(archive.getType() == ArchiveType.NEW){
+        if (archive.getType() == ArchiveType.NEW) {
             List<String> currentDateArchivesLinks;
             int index = 1;
-            do{
+            do {
                 currentDateArchivesLinks = parseLinkFromPage(archive.getLink() + "/" + index, config.getOpts().get("selectOptionsLinksArchivesByDate").get("new"));
                 dateArchivesLinks.addAll(currentDateArchivesLinks);
                 index++;
             } while (!currentDateArchivesLinks.isEmpty());
-        }
-        else {
+        } else {
             dateArchivesLinks = parseLinkFromPage(archive.getLink(), config.getOpts().get("selectOptionsLinksArchivesByDate").get("old"));
             dateArchivesLinks = makeURlArchives(content, dateArchivesLinks);
         }
