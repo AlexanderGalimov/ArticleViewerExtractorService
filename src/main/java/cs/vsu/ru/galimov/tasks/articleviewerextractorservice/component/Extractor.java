@@ -1,4 +1,4 @@
-package cs.vsu.ru.galimov.tasks.articleviewerextractorservice.components;
+package cs.vsu.ru.galimov.tasks.articleviewerextractorservice.component;
 
 import cs.vsu.ru.galimov.tasks.articleviewerextractorservice.model.*;
 import cs.vsu.ru.galimov.tasks.articleviewerextractorservice.parser.VestnikHtmlPageParser;
@@ -17,7 +17,6 @@ public class Extractor {
     private final VestnikHtmlPageParser pageParser;
 
     private final ArticleSender articleSender;
-
     @Autowired
     public Extractor(VestnikHtmlPageParser pageParser, ArticleSender articleSender) {
         this.pageParser = pageParser;
@@ -39,7 +38,7 @@ public class Extractor {
         }
         List<Article> articles;
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 1; i++) {
             for (Archive archive : departmentMagazines.get(i).getArchives()) {
                 List<DateArchive> currDateArchives = findDateArchives(archive, magazinesURLs.get(i));
                 articles = makeArticles(departmentMagazines.get(i), currDateArchives, archive);

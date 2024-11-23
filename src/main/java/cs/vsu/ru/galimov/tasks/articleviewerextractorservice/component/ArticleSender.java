@@ -1,4 +1,4 @@
-package cs.vsu.ru.galimov.tasks.articleviewerextractorservice.components;
+package cs.vsu.ru.galimov.tasks.articleviewerextractorservice.component;
 
 import cs.vsu.ru.galimov.tasks.articleviewerextractorservice.kafka.producer.InputProducer;
 import cs.vsu.ru.galimov.tasks.articleviewerextractorservice.kafka.topic.InputTopic;
