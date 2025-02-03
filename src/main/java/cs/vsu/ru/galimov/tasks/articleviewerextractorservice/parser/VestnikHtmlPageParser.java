@@ -3,6 +3,7 @@ package cs.vsu.ru.galimov.tasks.articleviewerextractorservice.parser;
 import cs.vsu.ru.galimov.tasks.articleviewerextractorservice.model.*;
 import cs.vsu.ru.galimov.tasks.articleviewerextractorservice.parser.config.HtmlParseConfig;
 import lombok.Getter;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.*;
 
 @Getter
@@ -49,23 +51,51 @@ public class VestnikHtmlPageParser {
     }
 
     private List<String> parseLinkFromPage(String url, String selectOption) {
+        List<String> result = new ArrayList<>();
         try {
-            List<String> result = new ArrayList<>();
-
-            Document document = Jsoup.connect(url).get();
+            Document document = Jsoup.connect(url)
+                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                    .referrer("https://www.google.com/")
+                    .timeout(10_000)
+                    .ignoreHttpErrors(true)
+                    .execute()
+                    .parse();
 
             Elements elements = document.select(selectOption);
-
             for (Element link : elements) {
-                String currURl = link.attr("href");
-                result.add(currURl);
+                result.add(link.attr("href"));
             }
-            return result;
+
+        } catch (HttpStatusException e) {
+            logger.error("HTTP error: " + e.getStatusCode() + " for URL: " + url);
+        } catch (IOException e) {
+            logger.error("I/O error: " + e.getMessage());
         } catch (Exception e) {
-            logger.error("Error in parse link from page listen" + e.getMessage());
+            logger.error("Unexpected error: " + e.getMessage());
         }
-        return new ArrayList<>();
+
+        return result;
     }
+
+
+//    private List<String> parseLinkFromPage(String url, String selectOption) {
+//        try {
+//            List<String> result = new ArrayList<>();
+//
+//            Document document = Jsoup.connect(url).get();
+//
+//            Elements elements = document.select(selectOption);
+//
+//            for (Element link : elements) {
+//                String currURl = link.attr("href");
+//                result.add(currURl);
+//            }
+//            return result;
+//        } catch (Exception e) {
+//            logger.error("Error in parse link from page listen" + e.getMessage());
+//        }
+//        return new ArrayList<>();
+//    }
 
     public List<String> parseInfoFromDateArchivePage(String url, ArchiveType type) {
         List<String> dateArchivesInfo = new ArrayList<>();

@@ -25,3 +25,30 @@ scrape_configs:
       - targets: [ 'host.docker.internal:9200' ]
     tls_config:
       insecure_skip_verify: true
+
+  - job_name: 'S3 File Parse Service'
+    scrape_interval: 5s
+    metrics_path: '/actuator/prometheus'
+    scheme: http
+    static_configs:
+      - targets: [ 'host.docker.internal:9300' ]
+    tls_config:
+      insecure_skip_verify: true
+
+  - job_name: 'Article Viewer Summary Service'
+    scrape_interval: 5s
+    metrics_path: '/actuator/prometheus'
+    scheme: http
+    static_configs:
+      - targets: [ 'host.docker.internal:9400' ]
+    tls_config:
+      insecure_skip_verify: true
+
+  - job_name: 'Article Viewer Neo Store Service'
+    scrape_interval: 5s
+    metrics_path: '/actuator/prometheus'
+    scheme: http
+    static_configs:
+      - targets: [ 'host.docker.internal:9500' ]
+    tls_config:
+      insecure_skip_verify: true
