@@ -220,21 +220,25 @@ public class VestnikHtmlPageParser {
     public List<DateArchive> parseDateArchives(Archive archive, String content) {
         List<DateArchive> dateArchives = new ArrayList<>();
         List<String> dateArchivesLinks = new ArrayList<>();
+        List<String> info = new ArrayList<>();
 
         if (archive.getType() == ArchiveType.NEW) {
             List<String> currentDateArchivesLinks;
+            List<String> currentInfo;
             int index = 1;
             do {
                 currentDateArchivesLinks = parseLinkFromPage(archive.getLink() + "/" + index, config.getOpts().get("selectOptionsLinksArchivesByDate").get("new"));
                 dateArchivesLinks.addAll(currentDateArchivesLinks);
+                currentInfo = parseInfoFromDateArchivePage(archive.getLink() + "/" + index, archive.getType());
+                info.addAll(currentInfo);
                 index++;
             } while (!currentDateArchivesLinks.isEmpty());
         } else {
             dateArchivesLinks = parseLinkFromPage(archive.getLink(), config.getOpts().get("selectOptionsLinksArchivesByDate").get("old"));
             dateArchivesLinks = makeURlArchives(content, dateArchivesLinks);
+            info = parseInfoFromDateArchivePage(archive.getLink(), archive.getType());
         }
 
-        List<String> info = parseInfoFromDateArchivePage(archive.getLink(), archive.getType());
         if (dateArchivesLinks.size() == info.size()) {
             for (int i = 0; i < dateArchivesLinks.size(); i++) {
                 dateArchives.add(new DateArchive(info.get(i), dateArchivesLinks.get(i)));

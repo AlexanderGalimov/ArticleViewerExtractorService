@@ -1,0 +1,17 @@
+{
+	"ulid": "01JQXPHP687C92M4088F91831R",
+	"minTime": 1743021345078,
+	"maxTime": 1743026400000,
+	"stats": {
+		"numSamples": 2065,
+		"numSeries": 35,
+		"numChunks": 35
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01JQXPHP687C92M4088F91831R"
+		]
+	},
+	"version": 1
+}

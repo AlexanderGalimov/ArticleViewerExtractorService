@@ -1,0 +1,30 @@
+@startuml
+actor Administrator
+participant "Article Extractor" as Extractor
+participant "Resource" as Resource
+participant "Kafka" as Kafka
+
+loop Ежемесячно
+    activate Administrator
+    Administrator -> Extractor: Запуск парсинга статей
+    activate Extractor
+    Extractor -> Resource: Парсинг страниц ресурса
+    alt Успешный парсинг
+        activate Resource
+        Resource --> Extractor: Данные статьи
+        Extractor -> Extractor: Формирование объекта Article
+        Extractor -> Kafka: Передача статьи (JSON)
+        activate Kafka
+        Kafka -> Extractor: ACK
+        deactivate Kafka
+
+    else Ошибка парсинга
+        Resource --> Extractor: Ошибка парсинга
+        deactivate Resource
+        Extractor --> Administrator: Логирование ошибки
+    end
+    activate Extractor
+    deactivate Administrator
+end
+
+@enduml

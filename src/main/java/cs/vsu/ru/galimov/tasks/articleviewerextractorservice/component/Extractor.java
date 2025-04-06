@@ -38,13 +38,19 @@ public class Extractor {
         }
         List<Article> articles;
 
-        for (int i = 8; i < 9; i++) {
+        for (int i = 0; i < 1; i++) {
+            List<Article> result = new ArrayList<>();
             for (Archive archive : departmentMagazines.get(i).getArchives()) {
-                List<DateArchive> currDateArchives = findDateArchives(archive, magazinesURLs.get(i));
-                articles = makeArticles(departmentMagazines.get(i), currDateArchives, archive);
-                articleSender.sendMessagesToKafka(articles);
+                if(archive.getType().equals(ArchiveType.OLD)){
+                    List<DateArchive> currDateArchives = findDateArchives(archive, magazinesURLs.get(i));
+                    articles = makeArticles(departmentMagazines.get(i), currDateArchives, archive);
+                    result.addAll(articles);
+                    articleSender.sendMessagesToKafka(articles);
+                }
             }
+            articleSender.sendMessagesToKafka(result);
         }
+        System.out.println("finished");
     }
 
     private List<Article> makeArticles(DepartmentMagazine departmentMagazine, List<DateArchive> currDateArchivesLinks, Archive archive) {

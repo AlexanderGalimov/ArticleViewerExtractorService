@@ -1,0 +1,17 @@
+{
+	"ulid": "01JR579Y1K2M65APTNPKY5Z2PE",
+	"minTime": 1743921359857,
+	"maxTime": 1743926400000,
+	"stats": {
+		"numSamples": 31563,
+		"numSeries": 692,
+		"numChunks": 734
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01JR579Y1K2M65APTNPKY5Z2PE"
+		]
+	},
+	"version": 1
+}

@@ -1,19 +1,10 @@
 scrape_configs:
-  - job_name: 'Article Viewer Data Read'
-    scrape_interval: 5s
-    metrics_path: '/actuator/prometheus'
-    scheme: http
-    static_configs:
-      - targets: ['host.docker.internal:8080']
-    tls_config:
-      insecure_skip_verify: true
-
   - job_name: 'Article Extractor Service'
     scrape_interval: 5s
     metrics_path: '/actuator/prometheus'
     scheme: http
     static_configs:
-      - targets: ['host.docker.internal:9100']
+      - targets: [ 'host.docker.internal:9100' ]
     tls_config:
       insecure_skip_verify: true
 
@@ -22,7 +13,7 @@ scrape_configs:
     metrics_path: '/actuator/prometheus'
     scheme: http
     static_configs:
-      - targets: [ 'host.docker.internal:9200' ]
+      - targets: [ 'host.docker.internal:9201' ]
     tls_config:
       insecure_skip_verify: true
 
@@ -44,11 +35,29 @@ scrape_configs:
     tls_config:
       insecure_skip_verify: true
 
-  - job_name: 'Article Viewer Neo Store Service'
+  - job_name: 'Article Viewer NLP Keyword Extractor Service'
     scrape_interval: 5s
     metrics_path: '/actuator/prometheus'
     scheme: http
     static_configs:
       - targets: [ 'host.docker.internal:9500' ]
+    tls_config:
+      insecure_skip_verify: true
+
+  - job_name: 'Article Viewer Neo Store Service'
+    scrape_interval: 5s
+    metrics_path: '/actuator/prometheus'
+    scheme: http
+    static_configs:
+      - targets: [ 'host.docker.internal:9600' ]
+    tls_config:
+      insecure_skip_verify: true
+
+  - job_name: 'Article Viewer Data Read'
+    scrape_interval: 5s
+    metrics_path: '/actuator/prometheus'
+    scheme: http
+    static_configs:
+      - targets: [ 'host.docker.internal:8080' ]
     tls_config:
       insecure_skip_verify: true
